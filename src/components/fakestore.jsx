@@ -9,7 +9,7 @@ export function FakeStore()
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([{id:0, title:'', price:0, description:'', image:'', rating:{rate:0, count:0}}]);
     const [cartCount, setCartCount] = useState();
-    const [cartItems] = useState([]);
+    const [cartItems,setCartItems] = useState([]);
 
 
     function LoadCategories(){
@@ -26,15 +26,13 @@ export function FakeStore()
             setProducts(response.data);
         })
     }
-    function getCartCount(){
-        setCartCount(cartItems.length);
-    }
+    
     function handleAddToCartClick(id){
         axios.get(`https://fakestoreapi.com/products/${id}`)
         .then(response =>{
-            cartItems.push(response.data);
+            setCartItems(prevItems => [...prevItems, response.data]);
             alert(`${response.data.title} \n Added to Cart`);
-            getCartCount();
+            
         })
     }
     function handleCategoryChange(e){
@@ -49,8 +47,12 @@ export function FakeStore()
     useEffect(()=>{
         LoadCategories();
         LoadProducts(`https://fakestoreapi.com/products`);
-        getCartCount();
-    },[])
+        
+        
+    }, []);
+    useEffect(() => {
+        setCartCount(cartItems.length);
+    }, [cartItems]);
 
     return(
         <div className="container-fluid">
