@@ -8,6 +8,8 @@ export function FakeStore()
 
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([{id:0, title:'', price:0, description:'', image:'', rating:{rate:0, count:0}}]);
+    const [cartCount, setCartCount] = useState();
+    const [cartItems, setCartItems] = useState([]);
 
 
     function LoadCategories(){
@@ -18,16 +20,36 @@ export function FakeStore()
         })
     }
 
-    function LoadProducts(){
-        axios.get(`https://fakestoreapi.com/products`)
+    function LoadProducts(url){
+        axios.get(url)
         .then(response=>{
             setProducts(response.data);
         })
     }
+    function getCartCount(){
+        setCartCount(cartItems.length);
+    }
+    function handleAddToCartClick(id){
+        axios.get(`https://fakestoreapi.com/products/${id}`)
+        .then(response =>{
+            cartItems.push(response.data);
+            alert(`${response.data.title} \n Added to Cart`);
+            getCartCount();
+        })
+    }
+    function handleCategoryChange(e){
+        if(e.target.value==="all"){
+            LoadProducts('https://fakestoreapi.com/products')
+        } else {
+            LoadProducts(`https://fakestoreapi.com/products/category/${e.target.value}`)
+
+        }
+    }
 
     useEffect(()=>{
         LoadCategories();
-        LoadProducts();
+        LoadProducts(`https://fakestoreapi.com/products`);
+        getCartCount();
     },[])
 
     return(
@@ -45,7 +67,48 @@ export function FakeStore()
                 <div>
                     <button className="btn btn-light"><span className="bi bi-person"></span></button>
                     <button className="btn btn-light mx-2"><span className="bi bi-heart"></span></button>
-                    <button className="btn btn-light"><span className="bi bi-cart"></span></button>
+                    <button className="btn btn-light bi bi-cart position-relative" data-bs-toggle="modal" data-bs-target="#cart" ><span className="badge bg-danger rounded rounded-circle">{cartCount}</span></button>
+                    <div className="modal fade" id="cart">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="fw-bold text-center text-black">Your Cart Items</h3>
+                                    <button className="btn btn-close" data-bs-dismiss= "modal"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <table className="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Preview</th>
+                                                <th>Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                cartItems.map(item=> 
+                                                    <tr key={item.id}>
+                                                        <td>{item.title}</td>
+                                                        <td><img alt={item.title} src={item.image} width="50" height="50" /></td>
+                                                        <td>{item.price}</td>
+                                                    </tr>
+                                                )
+
+                                            }
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                                <div className="modal-footer">
+
+                                </div>
+                                 
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
             </header>
             <section className="mt-3 row">
@@ -53,7 +116,7 @@ export function FakeStore()
                     <div>
                         <label className="form-label fw-bold">Select Category</label>
                         <div>
-                            <select className="form-select">
+                            <select onChange={handleCategoryChange} className="form-select">
                                 {
                                     categories.map(category=><option value={category} key={category}>{category.toUpperCase()}</option>)
                                 }
@@ -79,7 +142,7 @@ export function FakeStore()
                                     </dl>
                                 </div>
                                 <div className="card-footer">
-                                    <button className="btn btn-warning w-100"> <span className="bi bi-cart4"> Add to Cart </span> </button>
+                                    <button onClick={()=> handleAddToCartClick(product.id)} className="btn btn-warning w-100"> <span className="bi bi-cart4"> Add to Cart </span> </button>
                                 </div>
                             </div>
 
