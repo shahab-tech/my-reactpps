@@ -9,7 +9,7 @@ export function FakeStore()
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([{id:0, title:'', price:0, description:'', image:'', rating:{rate:0, count:0}}]);
     const [cartCount, setCartCount] = useState();
-    const [cartItems, setCartItems] = useState([]);
+    const [cartItems] = useState([]);
 
 
     function LoadCategories(){
