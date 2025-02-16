@@ -10,6 +10,7 @@ export function FakeStore()
     const [products, setProducts] = useState([{id:0, title:'', price:0, description:'', image:'', rating:{rate:0, count:0}}]);
     const [cartCount, setCartCount] = useState();
     const [cartItems,setCartItems] = useState([]);
+    const [searchString, setSearchString]= useState('');
 
 
     function LoadCategories(){
@@ -43,6 +44,26 @@ export function FakeStore()
 
         }
     }
+    function handleSearchChange(e){
+        setSearchString(e.target.value.toLowerCase());
+
+    }
+
+    function handleSearchClick(){
+        LoadProducts(`https://fakestoreapi.com/products/category/${searchString}`);
+
+    }
+
+    function handleRatingChange(e){
+        axios.get("https://fakestoreapi.com/products")
+        .then(response =>{
+            const filteredProducts= response.data.filter(product => product.rating.rate>= e.target.value);
+            console.log(filteredProducts);
+            setProducts(filteredProducts);
+            
+        })
+
+    }
 
     useEffect(()=>{
         LoadCategories();
@@ -60,12 +81,20 @@ export function FakeStore()
                 <div>
                     <span className="fs-4">Fakestore</span>
                 </div>
-                <nav>
+                
+                <nav className="p-2 fs-6">
                     <span> Electronics </span>
                     <span className="mx-2"> Men's Clothing </span>
                     <span> Women Fashon </span>
                     <span className="ms-2"> Jewelery </span>
                 </nav>
+                <div>
+                    <div className="input-group">
+                        <input type="text" placeholder="Search by Category" className="form-control" onChange={handleSearchChange} />
+                        <button className="btn btn-warning bi bi-search" onClick={handleSearchClick}></button>
+
+                    </div>
+                </div>
                 <div>
                     <button className="btn btn-light"><span className="bi bi-person"></span></button>
                     <button className="btn btn-light mx-2"><span className="bi bi-heart"></span></button>
@@ -123,6 +152,19 @@ export function FakeStore()
                                     categories.map(category=><option value={category} key={category}>{category.toUpperCase()}</option>)
                                 }
                             </select>
+                        </div>
+                        <div className="my-3">
+                            <label >Ratings</label>
+                            <div>
+                                <div>
+                                    <input onChange={handleRatingChange} type="checkbox" value={4} /><span> 4 <span className="bi bi-star-fill"> Above</span></span>
+                                </div>
+                                <div>
+                                    <input onChange={handleRatingChange} type="checkbox" value={3} /><span> 3 <span className="bi bi-star-fill"> Above</span></span>
+
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </nav>
