@@ -1,6 +1,7 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react"
+import { CustomAutoComplete } from "./customautocomplete";
 
 
 export function FakeStore()
@@ -10,7 +11,7 @@ export function FakeStore()
     const [products, setProducts] = useState([{id:0, title:'', price:0, description:'', image:'', rating:{rate:0, count:0}}]);
     const [cartCount, setCartCount] = useState();
     const [cartItems,setCartItems] = useState([]);
-    const [searchString, setSearchString]= useState('');
+    
 
 
     function LoadCategories(){
@@ -44,15 +45,7 @@ export function FakeStore()
 
         }
     }
-    function handleSearchChange(e){
-        setSearchString(e.target.value.toLowerCase());
 
-    }
-
-    function handleSearchClick(){
-        LoadProducts(`https://fakestoreapi.com/products/category/${searchString}`);
-
-    }
 
     function handleRatingChange(e){
         axios.get("https://fakestoreapi.com/products")
@@ -64,6 +57,14 @@ export function FakeStore()
         })
 
     }
+    function handleSearchClickCustom(searchStr) {
+        // For "all", load all products; otherwise, load by category
+        if (searchStr.toLowerCase() === "all") {
+          LoadProducts("https://fakestoreapi.com/products");
+        } else {
+          LoadProducts(`https://fakestoreapi.com/products/category/${searchStr}`);
+        }
+      }
 
     useEffect(()=>{
         LoadCategories();
@@ -89,11 +90,10 @@ export function FakeStore()
                     <span className="ms-2"> Jewelery </span>
                 </nav>
                 <div>
-                    <div className="input-group">
-                        <input type="text" placeholder="Search by Category" className="form-control" onChange={handleSearchChange} />
-                        <button className="btn btn-warning bi bi-search" onClick={handleSearchClick}></button>
-
-                    </div>
+                <CustomAutoComplete 
+            categories={categories} 
+            onSearch={handleSearchClickCustom} 
+          />
                 </div>
                 <div>
                     <button className="btn btn-light"><span className="bi bi-person"></span></button>
