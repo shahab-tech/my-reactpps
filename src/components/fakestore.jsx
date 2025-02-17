@@ -11,6 +11,7 @@ export function FakeStore()
     const [products, setProducts] = useState([{id:0, title:'', price:0, description:'', image:'', rating:{rate:0, count:0}}]);
     const [cartCount, setCartCount] = useState();
     const [cartItems,setCartItems] = useState([]);
+    const [alertMessage, setAlertMessage] = useState(null);
     
 
 
@@ -33,9 +34,11 @@ export function FakeStore()
         axios.get(`https://fakestoreapi.com/products/${id}`)
         .then(response =>{
             setCartItems(prevItems => [...prevItems, response.data]);
-            alert(`${response.data.title} \n Added to Cart`);
-            
-        })
+            setAlertMessage(`${response.data.title} \n Added to Cart`);
+            setTimeout(() => {
+                setAlertMessage(null);
+              }, 2000);
+        });
     }
     function handleCategoryChange(e){
         if(e.target.value==="all"){
@@ -78,6 +81,22 @@ export function FakeStore()
 
     return(
         <div className="container-fluid">
+
+        {alertMessage && (
+            <div
+                style={{
+                        position: "fixed",
+                        top: "60px",
+                        left: "40%",
+                        width: "300px",
+                        zIndex: 1000, // Ensure it's above other elements
+        }}
+  >
+            <div className="alert alert-primary" role="alert">
+                {alertMessage}
+            </div>
+            </div>
+)}
             <header className="d-flex bg-dark text-light fs-5 justify-content-between p-2 border mt-2">
                 <div>
                     <span className="fs-4">Fakestore</span>
@@ -90,10 +109,7 @@ export function FakeStore()
                     <span className="ms-2"> Jewelery </span>
                 </nav>
                 <div>
-                <CustomAutoComplete 
-            categories={categories} 
-            onSearch={handleSearchClickCustom} 
-          />
+                <CustomAutoComplete categories={categories} onSearch={handleSearchClickCustom} />
                 </div>
                 <div>
                     <button className="btn btn-light"><span className="bi bi-person"></span></button>
